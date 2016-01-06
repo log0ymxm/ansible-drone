@@ -2,6 +2,12 @@
 
 Install [drone](https://github.com/drone/drone), [docker](https://www.docker.io/), required and optional docker images for drone operation.
 
+## WARNING
+
+Drone is changing too fast and too much for me to keep up.  There is an experimental branch called `toml` that may work for Drone `0.3`.
+
+It probably isn't advisable to use this role.
+
 ## Requirements
 
 1. Ubuntu 12.04+
