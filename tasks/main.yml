@@ -13,7 +13,7 @@
     version: "{{ item.version }}"
   with_items:
     - name: docker-py
-      version: 0.3.0
+      version: 1.1.0
 
 - name: Check for drone
   stat:
@@ -28,78 +28,22 @@
     group: root
     mode: 0700
 
-- name: Determine if Drone should be installed
-  set_fact:
-    install_drone: "{{ not drone_stat.stat.exists or upgrade_drone|default(False)|bool == True }}"
+- name: Pull drone container
+  command: docker pull drone/drone:0.4
 
-- name: Download drone.deb
-  get_url:
-    url: http://downloads.drone.io/latest/drone.deb
-    dest: /tmp/drone.deb
-    force: "{{ install_drone|default(False)|bool }}"
-  register: drone_get
-
-- name: Install drone.deb
-  command: dpkg --force-confdef --force-confold -i /tmp/drone.deb
-  environment:
-    DEBIAN_FRONTEND: noninteractive
-    DEBIAN_PRIORITY: critical
-  register: drone_dpkg
-  when: install_drone|default(False)|bool
-  notify:
-   - restart drone
-
-- name: Install required drone images
-  drone_docker_pull:
-    name: "{{ item }}"
-  with_items:
-    - bradrydzewski/ubuntu
-    - bradrydzewski/base
-
-- name: Install optionally specified drone images
-  drone_docker_pull:
-    name: "{{ item.name }}"
-    tag: "{{ item['tag']|default('latest') }}"
-    state: "{{ item['state']|default('present') }}"
-  with_items: drone_images
-
-- name: Install sqlite3 for drone configuration
-  apt:
-    name: sqlite3
-    cache_valid_time: 86400
-    update_cache: yes
-
-- name: Template sqlite file for drone configuration
+- name: Create drone configuration file
   template:
-    src: drone.sql.j2
-    dest: /etc/drone/drone.sql
-    owner: root
-    group: root
-    mode: 0600
-  register: drone_sql
-
-- name: Hash tables to validate change
-  shell: "sqlite3 /var/lib/drone/drone.sqlite 'SELECT * FROM users; SELECT * FROM settings;' | md5sum"
-  register: drone_before_hash
-  changed_when: False
-
-- name: Configure drone settings
-  shell: "sqlite3 /var/lib/drone/drone.sqlite '.read /etc/drone/drone.sql' && sqlite3 /var/lib/drone/drone.sqlite 'SELECT * FROM users; SELECT * FROM settings;' | md5sum"
-  register: drone_after_hash
-  changed_when: drone_after_hash.stdout != drone_before_hash.stdout
-
-- name: Configure drone daemon
-  template:
-    src: default.j2
-    dest: /etc/default/drone
+    src: dronerc.j2
+    dest: /etc/drone/dronerc
     owner: root
     group: root
     mode: 0644
-  notify:
-    - restart drone
+
+- name: stop drone
+  command: docker stop drone
+
+- name: rm drone
+  command: docker rm drone
 
 - name: Ensure drone is started
-  service:
-    name: drone
-    state: started
-    enabled: yes
+  command: docker run --volume /var/lib/drone:/var/lib/drone --volume /var/run/docker.sock:/var/run/docker.sock --env-file /etc/drone/dronerc --restart=always --publish=8000:8000 --detach=true --name=drone drone/drone:0.4
