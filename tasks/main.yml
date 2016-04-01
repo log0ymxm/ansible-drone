@@ -47,3 +47,14 @@
 
 - name: Ensure drone is started
   command: "docker run --volume /var/lib/drone:/var/lib/drone --volume /var/run/docker.sock:/var/run/docker.sock {{drone_docker_additional_args}} --env-file /etc/drone/dronerc --restart=always --publish=8000:8000 --detach=true --name=drone drone/drone:0.4"
+
+- name: Setup some cleanup tasks in cron
+  cron: name={{item.name}}
+        job={{item.job}}
+        minute="0"
+        hour="0"
+        weekday="0"
+  with_items:
+    - {name: "clear_drone_cache", job: "find /var/lib/drone/cache -name *.tar | xargs rm"}
+    - {name: "clear_exited_docker", job: "docker rm `docker ps -a | grep Exited | awk '{print $1 }'`"}
+    - {name: "clear_docker_aq", job: "docker rmi `docker images -aq`"}
