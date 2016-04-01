@@ -4,7 +4,7 @@ DEBUG=true
 
 REMOTE_DRIVER={{drone_remote_driver}}
 
-{% if drone_remote_driver = "github" %}
+{% if drone_remote_driver == "github" %}
 REMOTE_CONFIG=https://{{drone_github_url}}?client_id={{drone_github_key}}&client_secret={{drone_github_secret}}{% if drone_github_open %}&open=true{% endif %}{% if drone_github_private_mode %}&private_mode=true{% endif %}{% if drone_github_skip_verify %}skip_verify=true{% endif %}{% for org in drone_github_organizations %}&orgs={{org}}{% endfor %}
 {% endif %}
 
