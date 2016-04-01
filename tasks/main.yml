@@ -29,7 +29,7 @@
     mode: 0700
 
 - name: Pull drone container
-  command: docker pull drone/drone:0.4
+  command: docker pull drone/drone:0.4.1
 
 - name: Create drone configuration file
   template:
