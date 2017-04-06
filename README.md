@@ -1,5 +1,7 @@
 # Drone Ansible Role
 
+Note: this readme is out of date. In general the best documentation currently would be reading through the ansible tasks and defaults in code.
+
 Install [drone](https://github.com/drone/drone), [docker](https://www.docker.io/), required and optional docker images for drone operation.
 
 ## WARNING
@@ -17,13 +19,6 @@ It probably isn't advisable to use this role.
 ### Upgrades
 
 Drone does not currently offer an apt repository, to upgrade to a new verison supply `--extra-vars upgrade_drone=true` with your `ansible-playbook` run.
-
-### drone\_images
-
-`drone_images` is a list of hashes, each hash containing the following:
-
-* `name` name of the docker repo/image
-* `tag` repo/image tag to pull. Default `latest`
 
 ### drone\_users
 
@@ -95,14 +90,6 @@ Including an example of how to use your role (for instance, with variables passe
     - hosts: drone
       roles:
         - role: sivel.drone
-          drone_images:
-            - name: bradrydzewski/python
-              tag: 2.7
-            - name: bradrydzewski/go
-              tag: 1.2
-            - name: bradrydzewski/php
-              tag: 5.5
-              state: absent
           drone_users:
             - name: Jim Beam
               email: jim@jimbeam.com

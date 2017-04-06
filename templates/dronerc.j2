@@ -1,12 +1,13 @@
+DRONE_SECRET={{drone_secret}}
 {% if drone_debug %}
-DEBUG=true
+DRONE_DEBUG=true
 {% endif %}
+DRONE_ADMIN={% for admin in drone_admins %}{{admin}}{% if not loop.last %},{% endif %}{% endfor %}
 
-REMOTE_DRIVER={{drone_remote_driver}}
+DRONE_ORG={% for org in drone_orgs %}{{org}}{% if not loop.last %},{% endif %}{% endfor %}
 
-{% if drone_remote_driver == "github" %}
-REMOTE_CONFIG=https://{{drone_github_domain}}?client_id={{drone_github_key}}&client_secret={{drone_github_secret}}{% if drone_github_open %}&open=true{% endif %}{% if drone_github_private_mode %}&private_mode=true{% endif %}{% if drone_github_skip_verify %}skip_verify=true{% endif %}{% for org in drone_github_organizations %}&orgs={{org}}{% endfor %}
-{% endif %}
-
-DATABASE_DRIVER={{drone_database_driver}}
-DATABASE_CONFIG={{drone_database_config}}
+DRONE_GITHUB=true
+DRONE_GITHUB_CLIENT={{drone_github_client}}
+DRONE_GITHUB_SECRET={{drone_github_secret}}
+DRONE_DATABASE_DRIVER={{drone_database_driver}}
+DRONE_DATABASE_DATASOURCE={{drone_database_datasource}}

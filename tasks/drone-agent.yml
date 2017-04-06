@@ -1,0 +1,21 @@
+- name: Create drone agent configuration file
+  template:
+    src: drone_agentrc.j2
+    dest: /etc/drone/drone_agentrc
+    owner: root
+    group: root
+    mode: 0644
+
+- name: stop drone-agent
+  command: "docker stop drone-agent-{{item}}"
+  ignore_errors: True
+  with_sequence: "count={{drone_num_agents}}"
+
+- name: rm drone-agent
+  command: "docker rm drone-agent-{{item}}"
+  ignore_errors: True
+  with_sequence: "count={{drone_num_agents}}"
+
+- name: Ensure drone agent is started
+  command: "docker run --volume /var/run/docker.sock:/var/run/docker.sock {{drone_agent_docker_additional_args}} --env-file /etc/drone/drone_agentrc --restart=always --detach=true --name=drone-agent-{{item}} drone/drone:0.5 agent"
+  with_sequence: "count={{drone_num_agents}}"

@@ -1,20 +1,10 @@
 ---
 drone_debug: False
-drone_remote_driver: "github"
-
-drone_github_key: ''
-drone_github_secret: ''
-drone_github_domain: github.com
-drone_github_open: False
-drone_github_private_mode: False
-drone_github_skip_verify: False
-drone_github_organizations: []
-
-# TODO bitbucket
-# TODO gitlab
-# TODO gogs
 
 drone_database_driver: "sqlite3"
 drone_database_config: "/var/lib/drone/drone.sqlite"
 
 drone_docker_additional_args: ""
+drone_agent_docker_additional_args: ""
+
+drone_master: True

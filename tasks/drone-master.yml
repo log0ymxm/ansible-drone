@@ -1,0 +1,18 @@
+- name: Create drone master configuration file
+  template:
+    src: dronerc.j2
+    dest: /etc/drone/dronerc
+    owner: root
+    group: root
+    mode: 0644
+
+- name: stop drone
+  command: docker stop drone
+  ignore_errors: True
+
+- name: rm drone
+  command: docker rm drone
+  ignore_errors: True
+
+- name: Ensure drone is started
+  command: "docker run --volume /var/lib/drone:/var/lib/drone {{drone_docker_additional_args}} --env-file /etc/drone/dronerc --restart=always --publish=8000:8000 --detach=true --name=drone drone/drone:0.5"
